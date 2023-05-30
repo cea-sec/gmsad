@@ -1,0 +1,85 @@
+[gmsad]
+# logging level: can be DEBUG, INFO, WARNING, ERROR, CRITICAL
+loglevel = INFO
+# The time interval in seconds between each check for gMSA secrets expiration
+check_interval = 60
+
+# Here is an example of configuration to manage a gMSA. You can uncomment it
+# and adapt it to your needs.
+# There is one section per gMSA to manage.
+# [semoule]
+#
+# # The sAMAccountName of the gMSA (with the ending dollar)
+# gMSA_sAMAccountName = semoule$
+#
+# # the domain name of the gMSA
+# gMSA_domain = CANTINE.LOCAL
+#
+# # Optional: SPNs to store in keytab entries (comma-separated list).
+# # If not present, the keytab will contain only entries
+# # with <sAMAccountName>@<domain>
+# gMSA_servicePrincipalNames = http/semoule.cantine.local
+#
+# # File where to store the keytab of the gMSA. gmsad needs to
+# # have read and write permissions on it.
+# gMSA_keytab = /etc/semoule.keytab
+#
+# # Mask that contains the encryption types present in the keytab in Windows format.
+# # Only AES128-CTS-HMAC-SHA1-96 (8) and AES256-CTS-HMAC-SHA1-96 (16)
+# # are supported by gmsad.
+# # Defaults to 0x18 = 24 = AES128-CTS-HMAC-SHA1-96 and AES256-CTS-HMAC-SHA1-96
+# gMSA_enctypes = 24
+#
+# # Optional: If gMSA_servicePrincipalNames is not empty,
+# # <sAMAccountName>@<domain> is by default not present in the keytab. You can
+# # enable it using this option. This option has no effect is
+# # gMSA_servicePrincipalNames is empty (in this case the UPN is always present
+# # in the keytab).
+# gMSA_upn_in_keytab = yes
+#
+# # Optional: Specify the salt used to calculate Kerberos keys.
+# # This should not be used unless <gMSA_salt_from_heuristic>=yes did not work and/or
+# # you know what you are doing.
+# # gMSA_salt = CANTINE.LOCALhostsemoule.cantine.local
+#
+# # Optional: Specify how the salt, used to calculate Kerberos keys, should be
+# # calculated.
+# # This option has no effect if <gMSA_salt> is set.
+# # By default this option is set to "no", which means the salt is retrieved by
+# # parsing a pre-authentication request from the DC. This is the method used on
+# # Windows.
+# # If this option is set to "yes", the salt will be calculated using this heuristic:
+# # <gMSA_domain to upper case>host<gMSA_sAMAccountName>.<gMSA_domain to lower case>
+# # gMSA_salt_from_heuristic = yes
+#
+# # Principal of the computer account used to retrieve
+# # gMSA secret.
+# principal = couscous$@CANTINE.LOCAL
+#
+# # Keytab of the computer account used to retrieve
+# # gMSA secret.
+# keytab = /etc/krb5.keytab
+#
+# # Optional: Specify the hostname of the LDAP server to contact.
+# # By default, the Primary Domain Controller of the AD domain is used.
+# # Its hostname is retrieved using DNS (SRV record named _ldap._tcp.pdc._msdcs.<gMSA_domain>)
+# # Warning: For best redundancy, it is advised to keep this option UNSET.
+# # Warning: gmsad uses Kerberos to authenticate to the LDAP Server.
+# # host = dc.cantine.local
+#
+# # Optional: Specify the CA certificate to use to validate LDAP server
+# # certificate. By default, system installed certificates are used.
+# # tls_ca_certs_file = /etc/cantine.local.crt
+#
+# # Optional: Specify valid DNS names used for the TLS LDAP server
+# # name validation (comma-separated). See <host> option to define which
+# # LDAP server is used.
+# # tls_valid_names = dc.cantine.local,toto.cantine.local
+#
+# # Optional: Command to execute when SPN keys are updated.
+# on_spn_rotate_cmd = sudo systemctl reload apache2
+#
+# # Optional: Command to execute when UPN keys are updated.
+# # This only applies if gMSA_servicePrincipalNames is absent or
+# # if gMSA_upn_in_keytab is set.
+# # on_upn_rotate_cmd = echo "Do something"
