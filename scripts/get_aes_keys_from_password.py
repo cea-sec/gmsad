@@ -31,8 +31,7 @@ def __main__():
         password = args.password
     elif args.password_hex:
         password = binascii.unhexlify(args.password_hex)\
-            .decode('utf-16le', 'replace')\
-            .encode('utf-8')
+            .decode('utf-16le', 'replace')
     else:
         password = getpass.getpass()
 
@@ -46,8 +45,8 @@ def __main__():
     if args.verbose:
         print(f"salt: {salt}")
 
-    aes256_key = aes256_cts_hmac_sha1_96_string_to_key(password, salt.encode('utf-8'))
-    aes128_key = aes128_cts_hmac_sha1_96_string_to_key(password, salt.encode('utf-8'))
+    aes256_key = aes256_cts_hmac_sha1_96_string_to_key(password.encode('utf-8'), salt.encode('utf-8'))
+    aes128_key = aes128_cts_hmac_sha1_96_string_to_key(password.encode('utf-8'), salt.encode('utf-8'))
 
     print(f"AES256: {aes256_key.hex()}")
     print(f"AES128: {aes128_key.hex()}")
