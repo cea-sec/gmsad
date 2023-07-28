@@ -20,8 +20,9 @@ We did not find any documentation explaining exactly what are those time offsets
 <p align="center"><img src="./update-mecanism.png" style="background-color:white" width="100%"/></p>
 
 To retrieve the password, i.e. query `msDS-ManagedPassword`, the LDAP connection needs to provide confidentiality. It can be provided using:
-* GSSAPI Privacy. This is not supported by `ldap3`, therefore it is not supported by `gmsad`.
-* TLS, supported by `gmsad`.
+* GSSAPI Privacy (`kerberos`)
+* TLS (`tls`)
+
 
 The list of account allowed to access the gMSA password is stored in the `msDS-groupMSAMembership`. This attribute contains a Windows security descriptor. Here is an example:
 

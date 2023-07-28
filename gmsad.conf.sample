@@ -40,7 +40,7 @@ check_interval = 60
 # # Optional: Specify the salt used to calculate Kerberos keys.
 # # This should not be used unless <gMSA_salt_from_heuristic>=yes did not work and/or
 # # you know what you are doing.
-# # gMSA_salt = CANTINE.LOCALhostsemoule.cantine.local
+# gMSA_salt = CANTINE.LOCALhostsemoule.cantine.local
 #
 # # Optional: Specify how the salt, used to calculate Kerberos keys, should be
 # # calculated.
@@ -50,7 +50,7 @@ check_interval = 60
 # # Windows.
 # # If this option is set to "yes", the salt will be calculated using this heuristic:
 # # <gMSA_domain to upper case>host<gMSA_sAMAccountName>.<gMSA_domain to lower case>
-# # gMSA_salt_from_heuristic = yes
+# gMSA_salt_from_heuristic = yes
 #
 # # Principal of the computer account used to retrieve
 # # gMSA secret.
@@ -65,16 +65,22 @@ check_interval = 60
 # # Its hostname is retrieved using DNS (SRV record named _ldap._tcp.pdc._msdcs.<gMSA_domain>)
 # # Warning: For best redundancy, it is advised to keep this option UNSET.
 # # Warning: gmsad uses Kerberos to authenticate to the LDAP Server.
-# # host = dc.cantine.local
+# host = dc.cantine.local
+#
+# # Optional: Specify the encryption algorithms used to encrypt ldap messages.
+# # This field contains an ordered list of mechanisms, separated by commas.
+# # By default, gmsad will attempt to use Kerberos session encryption (if supported by
+# # ldap3), and fall back to TLS if something goes wrong.
+# encryption_mechs = kerberos,tls
 #
 # # Optional: Specify the CA certificate to use to validate LDAP server
 # # certificate. By default, system installed certificates are used.
-# # tls_ca_certs_file = /etc/cantine.local.crt
+# tls_ca_certs_file = /etc/cantine.local.crt
 #
 # # Optional: Specify valid DNS names used for the TLS LDAP server
 # # name validation (comma-separated). See <host> option to define which
 # # LDAP server is used.
-# # tls_valid_names = dc.cantine.local,toto.cantine.local
+# tls_valid_names = dc.cantine.local,toto.cantine.local
 #
 # # Optional: Command to execute when SPN keys are updated.
 # on_spn_rotate_cmd = sudo systemctl reload apache2
@@ -82,4 +88,4 @@ check_interval = 60
 # # Optional: Command to execute when UPN keys are updated.
 # # This only applies if gMSA_servicePrincipalNames is absent or
 # # if gMSA_upn_in_keytab is set.
-# # on_upn_rotate_cmd = echo "Do something"
+# on_upn_rotate_cmd = echo "Do something"
