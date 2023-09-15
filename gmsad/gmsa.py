@@ -163,6 +163,12 @@ class GMSAState:
             'msDS-SupportedEncryptionTypes', # Supported enctypes
         ])
 
+        if len(attributes['msDS-ManagedPassword'].raw_values) == 0:
+            raise ValueError(
+                    "Could not retrieve msDS-ManagedPassword attribute of gMSA account %s in LDAP." \
+                    " Does your account have sufficient permissions ?"
+                    % self.config["gMSA_sAMAccountName"])
+
         password_blob = attributes['msDS-ManagedPassword'].raw_values[0]
         self.parse_managedpassword_blob(password_blob)
 

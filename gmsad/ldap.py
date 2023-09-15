@@ -58,9 +58,16 @@ class LDAPConnection:
 
         if not success:
             raise ValueError(
-                    "Could not find %s in LDAP" % self.config["gMSA_sAMAccountName"])
-        assert len(self.connection.entries) == 1
-        return self.connection.entries[0]
+                    "Could not find gMSA account %s in LDAP" % self.config["gMSA_sAMAccountName"])
+        if len(self.connection.entries) == 1:
+            return self.connection.entries[0]
+        elif len(self.connection.entries) == 0:
+            raise ValueError(
+                    "Could not find gMSA account %s in LDAP" % self.config["gMSA_sAMAccountName"])
+        else:
+            raise ValueError(
+                    "This is not supposed to happen, found too many gMSA accounts named %s in LDAP"
+                    % self.config["gMSA_sAMAccountName"])
 
     def close(self) -> None:
         self.connection.unbind()
