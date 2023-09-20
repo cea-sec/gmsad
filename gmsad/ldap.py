@@ -1,11 +1,60 @@
 import configparser
 import logging
 import ssl
-from typing import List, Any
+from typing import List, Any, Tuple
+import traceback
 
 import ldap3
 
 from gmsad.utils import get_dc
+
+def setup_kerberos_connection(config: configparser.SectionProxy,
+                              host: str) -> Tuple[ldap3.Server, ldap3.Connection]:
+    try:
+        from ldap3 import ENCRYPT
+    except ImportError:
+        raise Exception("ldap3 version does not support Kerberos encryption")
+
+    server = ldap3.Server(host, get_info=ldap3.ALL)
+    connection = ldap3.Connection(
+            server,
+            user=config["principal"],
+            authentication=ldap3.SASL,
+            sasl_mechanism=ldap3.KERBEROS,
+            auto_bind=True,
+            cred_store={'client_keytab': config["keytab"]},
+            session_security=ldap3.ENCRYPT)
+    return (server, connection)
+
+
+def setup_tls_connection(config: configparser.SectionProxy,
+                         host: str) -> Tuple[ldap3.Server, ldap3.Connection]:
+    # If <ca_certs_file> is not set, the system wide installed certificates
+    # are used.
+    tls = ldap3.Tls(
+        validate=ssl.CERT_REQUIRED,
+        version=ssl.PROTOCOL_TLSv1_2,
+        ca_certs_file=config.get("tls_ca_certs_file", fallback=None),
+        valid_names=config.getlist("tls_valid_names", fallback=None),
+    )
+
+    server = ldap3.Server(host, get_info=ldap3.ALL, tls=tls)
+    connection = ldap3.Connection(
+            server,
+            user=config["principal"],
+            authentication=ldap3.SASL,
+            sasl_mechanism=ldap3.KERBEROS,
+            auto_bind=True,
+            cred_store={'client_keytab': config["keytab"]})
+    connection.start_tls()
+    return (server, connection)
+
+
+ENCRYPTION_MECHS = {
+    'kerberos': setup_kerberos_connection,
+    'tls': setup_tls_connection,
+}
+
 
 class LDAPConnection:
     server: ldap3.Server
@@ -13,33 +62,33 @@ class LDAPConnection:
 
     def __init__(self, config: configparser.SectionProxy) -> None:
         self.config = config
-        # GSSAPI privacy is not supported by ldap3, so TLS is mandatory
-        # If <ca_certs_file> is not set, the system wide installed certificates
-        # are used.
-        tls = ldap3.Tls(
-                validate=ssl.CERT_REQUIRED,
-                version=ssl.PROTOCOL_TLSv1_2,
-                ca_certs_file=self.config.get("tls_ca_certs_file", fallback=None),
-                valid_names=self.config.getlist("tls_valid_names", fallback=None),
-        )
 
-        if "host" in self.config:
-            host = self.config["host"]
-        else:
-            host = get_dc(self.config['gMSA_domain'])
+        host = self.get_host()
         logging.debug("LDAP Server host to contact is %s", host)
 
-        self.server = ldap3.Server(host, get_info=ldap3.ALL, tls=tls)
-        self.connection = ldap3.Connection(
-                self.server,
-                user=self.config["principal"],
-                authentication=ldap3.SASL,
-                sasl_mechanism=ldap3.KERBEROS,
-                auto_bind=True,
-                cred_store={'client_keytab': self.config["keytab"]})
-        self.connection.start_tls()
+        succeed = False
+        for mech in config.get("encryption_mechs", fallback="kerberos,tls").lower().split(','):
+            if not mech in ENCRYPTION_MECHS:
+                raise ValueError(f"Unknown encryption mechanism '{mech}'")
+            try:
+                logging.debug("Setup a connection with '%s' encryption mechanism", mech)
+                self.server, self.connection = ENCRYPTION_MECHS[mech](config, host)
+                succeed = True
+                break
+            except Exception as e:
+                logging.warning("Failed to setup '%s' encryption mechanism: %s", mech, e)
+                logging.debug(traceback.format_exc())
+
+        if not succeed:
+            raise Exception("Could not setup a connection using specified mechanisms")
 
         logging.debug("Authenticated as %s", self.connection.extend.standard.who_am_i())
+
+    def get_host(self) -> str:
+        if "host" in self.config:
+            return self.config["host"]
+        else:
+            return get_dc(self.config['gMSA_domain'])
 
     def get_gmsa_attributes(self, attributes: List[str]) -> Any:
         """

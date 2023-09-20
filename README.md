@@ -10,13 +10,12 @@ Your Active Directory domain must be able to use group Managed Service Account w
 * AD schema updated to Windows Server 2012 ([Getting Started with Group Managed Service Accounts](https://learn.microsoft.com/en-us/windows-server/security/group-managed-service-accounts/getting-started-with-group-managed-service-accounts))
 * KDS Root Key deployed ([Create the Key Distribution Services KDS Root Key](https://learn.microsoft.com/en-us/windows-server/security/group-managed-service-accounts/create-the-key-distribution-services-kds-root-key))
 
-In addition, `gmsad` requires a working LDAPS interface on domain controllers with a valid TLS certificate.
-
 # Documentation
 
-- [Getting started with gmsad](doc/getting_started.md)
+- [Getting Started with gmsad](doc/getting_started.md)
 - [Why was this tool created ?](doc/genesis.md)
 - [How does a gMSA work ?](doc/gmsa.md)
+- [Encryption Mechanisms](doc/encryption.md)
 - [Talk at SSTIC 2023 (in french)](https://www.sstic.org/2023/presentation/gmsad/)
 
 # Contributing
