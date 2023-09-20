@@ -32,7 +32,8 @@ class TestGMSA(unittest.TestCase):
     def setUp(self):
         config = configparser.ConfigParser()
         config.read_string(SAMPLE_CONFIG)
-        self.gmsa_state = GMSAState(config["sample"])
+        keytabs = {}
+        self.gmsa_state = GMSAState(config["sample"], keytabs)
 
     def test_managedpassword_too_short(self):
         blob = bytes([0]*31)
