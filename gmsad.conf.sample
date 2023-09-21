@@ -22,6 +22,7 @@ check_interval = 60
 #
 # # File where to store the keytab of the gMSA. gmsad needs to
 # # have read and write permissions on it.
+# # You can use the same destination keytab for multiple gMSAs
 # gMSA_keytab = /etc/semoule.keytab
 #
 # # Mask that contains the encryption types present in the keytab in Windows format.

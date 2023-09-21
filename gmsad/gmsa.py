@@ -21,12 +21,11 @@ class GMSAState:
     unchanged_password_date: datetime
     keytab: Keytab
 
-    def __init__(self, config: configparser.SectionProxy) -> None:
+    def __init__(self, config: configparser.SectionProxy, keytab: Keytab) -> None:
         self.config = config
         self.current_password = bytes()
         self.previous_password = bytes()
-        self.keytab = Keytab()
-        self.keytab.open(self.config['gMSA_keytab'])
+        self.keytab = keytab
         self.query_password_date = datetime.fromtimestamp(0).astimezone()
         self.unchanged_password_date = datetime.fromtimestamp(0).astimezone()
 
