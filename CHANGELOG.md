@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support for storing multiple GMSAs secrets in a single keytab file (#5)
+- Print Kerberos error names (#7)
 
 ## [0.1.0] - 2023-06-05
 
