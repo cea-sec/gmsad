@@ -349,7 +349,8 @@ def get_salt_from_rep(kdc_rep: bytes) -> str:
                 if padata['padata-type'].native == PA_ETYPE_INFO2:
                     etype = ETYPE_INFO2()
                     for pa_etype_info2_value in etype.load(padata['padata-value'].native):
-                        if pa_etype_info2_value['etype'].native == AES256_CTS_HMAC_SHA1h96_ENC_TYPE:
+                        if (pa_etype_info2_value['etype'].native == AES256_CTS_HMAC_SHA1h96_ENC_TYPE
+                            or pa_etype_info2_value['etype'].native == AES128_CTS_HMAC_SHA1_96_ENC_TYPE):
                             # XXX: Adding str just for mypy
                             return str(pa_etype_info2_value['salt'].native)
         else:
@@ -362,8 +363,8 @@ def get_salt_from_rep(kdc_rep: bytes) -> str:
             if padata['padata-type'] == PA_ETYPE_INFO2:
                 etype = ETYPE_INFO2()
                 for pa_etype_info2_value in etype.load(padata['padata-value']):
-                    if pa_etype_info2_value['etype'].native == AES256_CTS_HMAC_SHA1h96_ENC_TYPE \
-                        or pa_etype_info2_value['etype'].native == AES128_CTS_HMAC_SHA1_96_ENC_TYPE:
+                    if (pa_etype_info2_value['etype'].native == AES256_CTS_HMAC_SHA1h96_ENC_TYPE
+                        or pa_etype_info2_value['etype'].native == AES128_CTS_HMAC_SHA1_96_ENC_TYPE):
                         # XXX: Adding str just for mypy
                         return str(pa_etype_info2_value['salt'])
     raise Exception("Could not retrieve salt from AS_REP (tag number %d)" % tag)
