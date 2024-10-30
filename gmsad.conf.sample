@@ -84,3 +84,10 @@ check_interval = 60
 # # This only applies if gMSA_servicePrincipalNames is absent or
 # # if gMSA_upn_in_keytab is set.
 # # on_upn_rotate_cmd = echo "Do something"
+#
+# # Optional: LDAP client auto bind parameter.
+# # Can be one of: NONE, NO_TLS, TLS_AFTER_BIND, TLS_BEFORE_BIND.
+# # (https://ldap3.readthedocs.io/en/latest/connection.html)
+# # By default this option is set to "NO_TLS"
+# # Note: Seems to requires TLS_AFTER_BIND when working with a SambaAD
+# # ldap_auto_bind = NO_TLS

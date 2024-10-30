@@ -28,6 +28,19 @@ class LDAPConnection:
         else:
             host = get_dc(self.config['gMSA_domain'])
         logging.debug("LDAP Server host to contact is %s", host)
+        
+        auto_bind = ldap3.AUTO_BIND_NO_TLS
+        # Auto bind explicitly set in the configuration
+        if "ldap_auto_bind" in self.config:
+            auto_bind = self.config.get("ldap_auto_bind").upper()
+            # Allow to write 'AUTO_BIND_NONE' or just 'NONE'
+            if not auto_bind.startswith("AUTO_BIND_"):
+                auto_bind = f"AUTO_BIND_{auto_bind}"
+            if not hasattr(ldap3, auto_bind):
+                raise ValueError(f"Ldap Auto bind value {auto_bind} is invalid. See https://ldap3.readthedocs.io/en/latest/connection.html for the valid auto_bind values.")
+            else:
+                auto_bind = getattr(ldap3, auto_bind)
+
 
         self.server = ldap3.Server(host, get_info=ldap3.ALL, tls=tls)
         self.connection = ldap3.Connection(
@@ -35,7 +48,7 @@ class LDAPConnection:
                 user=self.config["principal"],
                 authentication=ldap3.SASL,
                 sasl_mechanism=ldap3.KERBEROS,
-                auto_bind=True,
+                auto_bind=auto_bind,
                 cred_store={'client_keytab': self.config["keytab"]})
         self.connection.start_tls()
 
