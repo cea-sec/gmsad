@@ -39,7 +39,12 @@ class LDAPConnection:
                 cred_store={'client_keytab': self.config["keytab"]})
         self.connection.start_tls()
 
-        logging.debug("Authenticated as %s", self.connection.extend.standard.who_am_i())
+        try:
+            logging.debug("Authenticated as %s", self.connection.extend.standard.who_am_i())
+        except ldap3.core.exceptions.LDAPExtensionError as e:
+            if str(e) != "extension not in DSA list of supported extensions":
+                raise e
+            logging.debug("Authenticated as ??? (WhoAmI extension is not supported by the ldap server)")
 
     def get_gmsa_attributes(self, attributes: List[str]) -> Any:
         """
