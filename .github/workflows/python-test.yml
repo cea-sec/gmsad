@@ -31,5 +31,5 @@ jobs:
           python -m unittest -v
       - name: Mypy
         run: |
-          sudo apt-get install -y --no-install-recommends mypy python3-pycryptodome python3-dnspython
+          sudo apt-get install -y --no-install-recommends mypy python3-cryptography python3-dnspython
           mypy gmsad

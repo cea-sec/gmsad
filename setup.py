@@ -24,7 +24,7 @@ setup(
         'ldap3',
         'gssapi',
         'dnspython',
-        'pycryptodomex',
+        'cryptography',
         'asn1crypto',
     ],
     extras_require={
