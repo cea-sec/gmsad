@@ -2,10 +2,9 @@
 aes128-cts-hmac-sha1-96 and aes256-cts-hmac-sha1-96 implementation as described
 in RFC 3961 and RFC 3962.
 """
-import typing
+import hashlib
 
-from Cryptodome.Cipher import AES
-from Cryptodome.Protocol import KDF
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 
 # Constants retrieved from examples of annexe A.1 in RFC 3961
@@ -31,15 +30,19 @@ RFC_AES128_CTS_HMAC_SHA1_96 = 17
 RFC_AES256_CTS_HMAC_SHA1_96 = 18
 
 
+def _aes_cbc_encrypt(key: bytes, data: bytes) -> bytes:
+    """AES-CBC encryption with the RFC 3961 all-zero IV and no padding.
+    `data` must be a multiple of the 16-byte AES block size."""
+    encryptor = Cipher(algorithms.AES(key), modes.CBC(bytes(IV))).encryptor()
+    return encryptor.update(data) + encryptor.finalize()
+
+
 def aes128_cts_hmac_sha1_96_string_to_key(password: bytes, salt: bytes) -> bytes:
     """string_to_key function for aes128_cts_hmac_sha1_96
     Defined in RFC 3962 section 4"""
     key_size = 16 # 128 bits key for AES128 (see NIST FIPS 197)
-    # Password cast in str is required for mypy type checking
-    # but PBKDF2 accept bytes input
-    aes_128_key = KDF.PBKDF2(typing.cast(str, password), salt, key_size, ITERATION)
-    cipher = AES.new(aes_128_key, AES.MODE_CBC, bytes(IV))
-    return cipher.encrypt(bytes(AES_CONSTANT_128_FOLD))
+    aes_128_key = hashlib.pbkdf2_hmac("sha1", password, salt, ITERATION, dklen=key_size)
+    return _aes_cbc_encrypt(aes_128_key, bytes(AES_CONSTANT_128_FOLD))
 
 
 def aes256_cts_hmac_sha1_96_string_to_key(password: bytes, salt: bytes) -> bytes:
@@ -60,15 +63,10 @@ def aes256_cts_hmac_sha1_96_string_to_key(password: bytes, salt: bytes) -> bytes
           DR(Key, Constant) = k-truncate(K1 | K2 | K3 | K4 ...)
     """
     key_size = 32 # 256 bits key for AES256 (see NIST FIPS 197)
-    # password cast in str is required for mypy type checking
-    # but PBKDF2 accept bytes input
-    aes_256_key = KDF.PBKDF2(typing.cast(str, password), salt, key_size, ITERATION)
+    aes_256_key = hashlib.pbkdf2_hmac("sha1", password, salt, ITERATION, dklen=key_size)
 
-    cipher = AES.new(aes_256_key, AES.MODE_CBC, bytes(IV))
-    k1 = cipher.encrypt(bytes(AES_CONSTANT_128_FOLD))
-
-    cipher = AES.new(aes_256_key, AES.MODE_CBC, bytes(IV))
-    k2 = cipher.encrypt(bytearray(k1))
+    k1 = _aes_cbc_encrypt(aes_256_key, bytes(AES_CONSTANT_128_FOLD))
+    k2 = _aes_cbc_encrypt(aes_256_key, bytes(k1))
 
     return k1 + k2
 
