@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ##  [Unreleased]
 
+##  [0.2.1] - 2026-08-19
+
 ### Changed
 
 - Replace pycryptodomex dependency with Python stdlib hashlib and the cryptography library
+- Drop Python 3.7 from the tested Python versions (#15)
 
 ##  [0.2.0] - 2024-12-19
 
