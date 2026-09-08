@@ -8,7 +8,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='gmsad',
-    version='0.2.0',
+    version='0.2.1',
     author='Vincent Ruello',
     author_email='vincent.ruello@cea.fr',
     description="Linux service to manage gMSA accounts",
